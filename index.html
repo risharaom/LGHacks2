@@ -6,9 +6,39 @@
     <title>Your Safe Space - Mental Health Support</title>
     <meta name="description" content="A calming chatbot app providing mental health and addiction recovery resources in a safe, supportive environment.">
     <link rel="stylesheet" href="styles.css">
-</head>
+    
+    <style>
+        /*
+        The navigation bar is likely 'position: fixed', causing it to overlap the content.
+        This padding pushes the main content down so the 'Mental Health Resources' title 
+        is fully visible beneath the header. Adjust '100px' if the header is taller or shorter.
+        */
+        .main-content {
+            padding-top: 100px; 
+        }
+
+        /* Ensure the header is indeed fixed and on top of everything. 
+        If the original CSS already had this, you can remove this block, 
+        but it's a good check. 
+        */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            /* Assuming the header has a background color to cover the content beneath it */
+            background-color: white; 
+        }
+
+        /* Optional: Add a little extra space above the title within the tab */
+        #mental-health-tab .resources-header {
+            padding-top: 20px;
+        }
+
+    </style>
+    </head>
 <body>
-    <!-- Navigation -->
     <header class="header">
         <div class="container header-content">
             <div class="logo-section">
@@ -23,7 +53,6 @@
                 </div>
             </div>
 
-            <!-- Desktop Navigation -->
             <nav class="desktop-nav">
                 <button class="nav-btn active" data-tab="chat">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -52,7 +81,6 @@
                 </button>
             </nav>
 
-            <!-- Mobile Menu Button -->
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -63,7 +91,6 @@
         </div>
     </header>
 
-    <!-- Mobile Menu Overlay -->
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-content">
             <h3>Menu</h3>
@@ -95,7 +122,6 @@
         </div>
     </div>
 
-    <!-- Hero Section -->
     <div class="hero" id="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -104,9 +130,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Chat Tab -->
         <div class="tab-content active" id="chat-tab">
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages">
@@ -128,7 +152,6 @@
             </div>
         </div>
 
-        <!-- Mental Health Tab -->
         <div class="tab-content" id="mental-health-tab">
             <div class="resources-header">
                 <h1 class="resources-title">Mental Health Resources</h1>
@@ -215,7 +238,6 @@
             </div>
         </div>
 
-        <!-- Addiction Tab -->
         <div class="tab-content" id="addiction-tab">
             <div class="resources-header">
                 <h1 class="resources-title gradient-secondary">Addiction Recovery Resources</h1>
@@ -299,7 +321,6 @@
             </div>
         </div>
 
-        <!-- Resources Menu Tab -->
         <div class="tab-content" id="resources-menu-tab">
             <div class="resources-header">
                 <h1 class="resources-title">Mental Health Resource Directory</h1>

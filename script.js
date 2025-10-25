@@ -38,62 +38,96 @@ navBtns.forEach(btn => {
 // =========================
 // ALERT DETECTION
 // =========================
-const alertKeywords = [
-  "heroin","cocaine","weed","marijuana","ganja","hash","ecstasy","molly","lsd","acid",
-  "vape","nicotine","cannabis","gabapentin","etizolam","2-dpmp","tobacco","fags","baccy",
-  "balloons","nitrous oxide","fentanyl","acetylfentanyl","opioid","opiate","drugs","suicide","self harm"
-];
-function detectAlert(message){
-  const lower = message.toLowerCase();
-  return alertKeywords.some(word => lower.includes(word));
-}
-function alertProfessional(message){
-  addMessage("⚠️ It seems you mentioned something serious regarding drugs or self-harm. Please consider contacting a professional immediately.", false);
-  addMessage(`📞 SAMHSA Helpline: 1-800-662-4357
-💬 Crisis Text Line: Text HELLO to 741741
-🌐 Visit [findtreatment.gov](https://findtreatment.gov)`, false);
-  console.log("ALERT TRIGGERED:", message);
-}
-
-// =========================
-// ICEBREAKERS
-// =========================
-const icebreakers = [
-  "Hello! I'm here to listen and support you. How are you feeling today?",
-  "Before we start, what's your favorite food?",
-  "Nice! What's your favorite color?",
-  "What's your favorite hobby?",
-  "Do you have a favorite movie or show?"
+const conversationFlow = [
+  { id: "icebreaker1", question: "Hey there! How are you feeling today?", next: (answer) => (answer.toLowerCase().includes("good") || answer.toLowerCase().includes("fine")) ? "icebreaker2" : "followup1" },
+  { id: "icebreaker2", question: "Glad to hear that 😊! How has your week been so far?", next: () => "followup2" },
+  { id: "followup1", question: "I’m sorry to hear that. What’s been on your mind lately?", next: () => "followup2" },
+  { id: "followup2", question: "When you’re stressed or upset, what do you usually do to feel better?", next: (answer) => {
+      if (answer.toLowerCase().includes("friends")) return "followup3_friends";
+      if (answer.toLowerCase().includes("alone")) return "followup3_alone";
+      return "followup3_generic";
+    } 
+  },
+  { id: "followup3_friends", question: "That’s great that you have supportive friends! Do you ever feel like they influence your habits or choices?", next: () => "wrapup" },
+  { id: "followup3_alone", question: "It sounds like you prefer handling things on your own. Does that ever get overwhelming?", next: () => "wrapup" },
+  { id: "followup3_generic", question: "That’s one way to handle it. Has that been helping you lately?", next: () => "wrapup" },
+  { id: "wrapup", question: "Thanks for sharing that. Would you like to keep chatting or take a quick mental wellness check?", next: () => null }
 ];
 
 // =========================
-// MAIN WELLNESS QUESTIONS
+// WELLNESS CHECK QUESTIONS
 // =========================
-const wellnessQuestions = [
-  { key: "Experimentation", question: "Have you experimented with substances or addictive habits? (Yes/No)" },
-  { key: "Academic_Performance_Decline", question: "Have you noticed a decline in your academic or work performance? (Yes/No)" },
-  { key: "Social_Isolation", question: "Have you withdrawn from social activities or friends recently? (Yes/No)" },
-  { key: "Financial_Issues", question: "Have you experienced financial problems due to your habits? (Yes/No)" },
-  { key: "Physical_Mental_Health_Problems", question: "Have you noticed physical or mental health problems from your habit? (Yes/No)" },
-  { key: "Legal_Consequences", question: "Have you faced legal trouble because of your habit? (Yes/No)" },
-  { key: "Relationship_Strain", question: "Have your relationships been strained due to your habit? (Yes/No)" },
-  { key: "Risk_Taking_Behavior", question: "Have you engaged in risky behaviors due to your habit? (Yes/No)" },
-  { key: "Withdrawal_Symptoms", question: "Do you experience withdrawal symptoms when you stop? (Yes/No)" },
-  { key: "Denial_and_Resistance_to_Treatment", question: "Do you resist acknowledging the problem or treatment? (Yes/No)" }
-];
-
-const concernLabels = {
-  "Experimentation": "Experimentation / Substance Use",
-  "Academic_Performance_Decline": "Academic Performance",
-  "Social_Isolation": "Social Withdrawal",
-  "Financial_Issues": "Financial Problems",
-  "Physical_Mental_Health_Problems": "Physical / Mental Health",
-  "Legal_Consequences": "Legal Issues",
-  "Relationship_Strain": "Relationship Strain",
-  "Risk_Taking_Behavior": "Risky Behavior",
-  "Withdrawal_Symptoms": "Withdrawal Symptoms",
-  "Denial_and_Resistance_to_Treatment": "Resistance to Treatment"
+const wellnessSections = {
+  "Social Isolation": [
+    "Have you intentionally withdrawn from social activities or friends recently?",
+    "Do you frequently feel isolated or alone, even when you are with others?",
+    "Are you spending significantly more time by yourself than you used to?",
+    "Have you started avoiding family gatherings or social events?"
+  ],
+  "Financial Issues": [
+    "Have you experienced financial difficulties or debt directly related to your habit?",
+    "Are you frequently running out of money because of the cost of your addiction?",
+    "Do you spend money on your addiction instead of essential items like food or tuition?"
+  ],
+  "Physical & Mental Health": [
+    "Have you noticed a decline in your overall physical health since your habit started?",
+    "Are you experiencing new or worsening mental health issues like anxiety or depression?",
+    "Do you often feel sick, exhausted, or unwell because of your substance use?"
+  ],
+  "Relationship Strain": [
+    "Has your addiction caused frequent arguments or conflicts with family members or friends?",
+    "Do you find yourself lying to or hiding your activities from the people you care about?",
+    "Are your relationships becoming strained or damaged by your behavior?"
+  ],
+  "Withdrawal Symptoms": [
+    "When you stop using your habit, do you experience physical discomfort or sickness?",
+    "Do you get anxious or restless if you cannot engage in your habit?",
+    "Do you need to use the substance just to feel 'normal'?"
+  ],
+  "Risk-Taking Behavior": [
+    "Have you engaged in dangerous or reckless activities while under the influence?",
+    "Do you take significant risks to obtain the substance or engage in your habit?",
+    "Have you ever had an accident directly related to your substance use?"
+  ]
 };
+
+let wellnessQuestions = [];
+for (const section in wellnessSections) {
+  wellnessQuestions.push({ section, questions: wellnessSections[section] });
+}
+
+// =========================
+// DRUG DETECTION SYSTEM
+// =========================
+const drugKeywords = [
+  "heroin","cocaine","weed","marijuana","ganja","hash","ecstasy","molly",
+  "lsd","acid","vape","nicotine","cannabis","gabapentin","etizolam",
+  "2-dpmp","tobacco","fags","baccy","balloons","nitrous oxide","fentanyl",
+  "acetylfentanyl","opioid","opiate","drugs"
+];
+
+function detectDrugMention(message) {
+  const lower = message.toLowerCase();
+  return drugKeywords.some(drug => lower.includes(drug));
+}
+
+function notifyDoctor(userMessage) {
+  console.log("🚨 ALERT: Doctor notified about potential drug mention.");
+  console.log("User message:", userMessage);
+}
+
+// Respond when drug mentioned
+function respondToDrugMention() {
+  addMessage("It sounds like you mentioned something related to drugs or substances. 💬", false);
+  setTimeout(() => {
+    addMessage("If you're struggling, you're not alone. Here are trusted resources:", false);
+    setTimeout(() => {
+      addMessage(`📞 SAMHSA Helpline: 1-800-662-4357  
+💬 Crisis Text Line: Text HELLO to 741741  
+🌐 Visit [findtreatment.gov](https://findtreatment.gov)`, false);
+    }, 1000);
+  }, 700);
+}
 
 // =========================
 // CHAT STATE
@@ -105,7 +139,7 @@ let wellnessAnswers = [];
 let finishedMainQuestions = false;
 
 // =========================
-// ADD CHAT MESSAGE
+// ADD MESSAGE
 // =========================
 function addMessage(text, isUser=false){
   const div = document.createElement('div');
@@ -121,14 +155,16 @@ function addMessage(text, isUser=false){
 // =========================
 // SEND MESSAGE
 // =========================
-function sendMessage(){
-  const msg = chatInput.value.trim();
-  if(!msg) return;
-  addMessage(msg, true);
+function sendMessage() {
+  const message = chatInput.value.trim();
+  if (!message) return;
+
+  addMessage(message, true);
   chatInput.value = '';
 
-  if(detectAlert(msg)){
-    alertProfessional(msg);
+  if (detectDrugMention(message)) {
+    respondToDrugMention();
+    notifyDoctor(message);
     return;
   }
 
@@ -142,82 +178,83 @@ function sendMessage(){
     return;
   }
 
-  if(inTellMeMore){
-    addMessage("Thanks for sharing that.", false);
-    inTellMeMore = false;
-    mainQuestionIndex++;
-    askNextMainQuestion();
-    return;
-  }
+  const currentQuestion = conversationFlow.find(q => q.id === currentQuestionId);
+  let nextQuestionId = currentQuestion?.next ? currentQuestion.next(message) : null;
 
-  if(!finishedMainQuestions && mainQuestionIndex < wellnessQuestions.length){
-    const answer = msg.toLowerCase().includes("yes") ? 1 : 0;
-    wellnessAnswers.push(answer);
-    if(answer === 1){
-      addMessage("Tell me more about that...", false);
-      inTellMeMore = true;
+  if (currentQuestionId === "wrapup") {
+    if (message.toLowerCase().includes("yes") || message.toLowerCase().includes("check")) {
+      inWellnessMode = true;
+      setTimeout(() => {
+        addMessage("Alright 💬 Let’s start your quick wellness check. Answer with Yes/No.", false);
+        setTimeout(() => askNextWellnessQuestion(), 1200);
+      }, 800);
+      return;
     } else {
-      addMessage("Thanks for sharing that.", false);
-      mainQuestionIndex++;
-      askNextMainQuestion();
+      setTimeout(() => addMessage("No worries 💛 I’m here if you want to chat.", false), 800);
+      return;
     }
+  }
+
+  if (nextQuestionId) {
+    currentQuestionId = nextQuestionId;
+    const nextQuestion = conversationFlow.find(q => q.id === currentQuestionId);
+    setTimeout(() => addMessage(nextQuestion.question, false), 800);
+  } else {
+    setTimeout(() => addMessage("Thanks for sharing 💬. I’ll analyze your well-being next.", false), 800);
+  }
+}
+
+// =========================
+// WELLNESS LOGIC
+// =========================
+function askNextWellnessQuestion() {
+  const section = wellnessQuestions[currentWellnessSection];
+  if (!section) {
+    addMessage("That’s all for now 💭 Thank you for taking this check.", false);
+    inWellnessMode = false;
+    currentWellnessSection = 0;
+    currentWellnessIndex = 0;
     return;
   }
 
-  // Comforting generic responses
-  const comfortingResponses = [
-    "I hear you.",
-    "That’s totally normal.",
-    "Thanks for sharing, I’m here for you.",
-    "It’s okay, take your time.",
-    "I understand, many people feel that way."
-  ];
-  const resp = comfortingResponses[Math.floor(Math.random()*comfortingResponses.length)];
-  addMessage(resp, false);
+  const question = section.questions[currentWellnessIndex];
+  addMessage(`${section.section} — ${question}`, false);
 }
 
-// =========================
-// ASK NEXT MAIN QUESTION
-// =========================
-function askNextMainQuestion(){
-  if(mainQuestionIndex < wellnessQuestions.length){
-    setTimeout(()=> addMessage(wellnessQuestions[mainQuestionIndex].question, false), 700);
+function handleWellnessResponse(answer) {
+  wellnessAnswers.push(answer.toLowerCase().includes("yes") ? 1 : 0);
+
+  const section = wellnessQuestions[currentWellnessSection];
+  currentWellnessIndex++;
+
+  if (currentWellnessIndex >= section.questions.length) {
+    currentWellnessSection++;
+    currentWellnessIndex = 0;
+    if (currentWellnessSection < wellnessQuestions.length) {
+      setTimeout(() => {
+        addMessage(`Next section: ${wellnessQuestions[currentWellnessSection].section}`, false);
+        setTimeout(() => askNextWellnessQuestion(), 1000);
+      }, 800);
+    } else {
+      addMessage("That was the last section ✅. Sending responses for analysis...", false);
+      inWellnessMode = false;
+      setTimeout(analyzeWellnessResponses, 1000);
+    }
   } else {
-    finishedMainQuestions = true;
-    setTimeout(analyzeWellnessResponses, 1000);
-  }
-}
-
-// =========================
-// GENERATE PERSONALIZED FEEDBACK
-// =========================
-function generatePersonalizedFeedback(addictionPercent, addictionClass, symptoms){
-  let feedback = `Your score indicates ${addictionClass} (${addictionPercent.toFixed(1)}%). `;
-
-  if(symptoms.length > 0){
-    feedback += "Based on your answers, some areas to focus on are: ";
-    feedback += symptoms.join(", ") + ". ";
-  }
-
-  if(addictionPercent <= 25){
-    feedback += "You appear to have low risk. Maintaining healthy routines and self-care is recommended.";
-  } else if(addictionPercent <= 50){
-    feedback += "You have a moderate risk. Consider mindfulness, journaling, and talking with trusted friends or a counselor.";
-  } else if(addictionPercent <= 75){
-    feedback += "You have a high risk. It is recommended to seek structured support programs or therapy and monitor triggers closely.";
-  } else {
-    feedback += "Your risk is very high. Please consider immediate professional help, contact hotlines, or rehabilitation services.";
+    setTimeout(() => askNextWellnessQuestion(), 700);
   }
 
   return feedback;
 }
 
 // =========================
-// ANALYZE WELLNESS RESPONSES
+// SEND WELLNESS RESPONSES TO BACKEND
 // =========================
-async function analyzeWellnessResponses(){
-  try{
-    addMessage("Analyzing your responses...", false);
+async function analyzeWellnessResponses() {
+  try {
+    addMessage("Analyzing your responses... 🔍", false);
+
+    const mappedResponses = wellnessAnswers.map(ans => ans ? 1 : 0);
 
     const response = await fetch("http://127.0.0.1:5000/analyze", {
       method: "POST",
@@ -227,32 +264,17 @@ async function analyzeWellnessResponses(){
 
     const data = await response.json();
 
-    const symptoms = wellnessQuestions
-      .filter((q,i)=> wellnessAnswers[i] === 1)
-      .map(q=> concernLabels[q.key] || q.key);
+    addMessage(`💊 Addiction Score: ${data.addiction_percent.toFixed(1)}%`, false);
+    addMessage(`Predicted Class: ${data.predicted_class}`, false);
 
-    const personalizedFeedback = generatePersonalizedFeedback(
-      data.addiction_percent,
-      data.predicted_class,
-      symptoms
-    );
-
-    addMessage(personalizedFeedback, false);
-
-    // Optional: store results in backend
-    await fetch("http://127.0.0.1:5000/store_results", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        addiction_percent: data.addiction_percent,
-        predicted_class: data.predicted_class,
-        symptoms: symptoms
-      })
-    });
-
-  } catch(err){
+    if (data.predicted_class === "Addicted" && data.addiction_percent >= 50) {
+      addMessage("⚠️ Your responses indicate potential addictive patterns. Consider talking to a professional.", false);
+    } else {
+      addMessage("✅ Your responses suggest moderate stress. Mindfulness, journaling, or relaxation exercises can help.", false);
+    }
+  } catch (err) {
     console.error("Error analyzing responses:", err);
-    addMessage("⚠️ Failed to analyze responses. Please try again.", false);
+    addMessage("⚠️ Failed to analyze responses. Please check your connection.", false);
   }
 }
 
@@ -260,11 +282,9 @@ async function analyzeWellnessResponses(){
 // EVENT LISTENERS
 // =========================
 sendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keypress', e=>{if(e.key==='Enter') sendMessage();});
-chatInput.addEventListener('input', ()=>{sendBtn.disabled = !chatInput.value.trim();});
-sendBtn.disabled = chatInput.value.trim() === '';
+chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+chatInput.addEventListener('input', () => { sendBtn.disabled = !chatInput.value.trim(); });
 
-// =========================
-// INITIALIZE CHAT
-// =========================
-setTimeout(()=> addMessage(icebreakers[0], false), 800);
+// Initialize chat
+sendBtn.disabled = true;
+setTimeout(() => addMessage(conversationFlow.find(q => q.id === "icebreaker1").question, false), 800);
