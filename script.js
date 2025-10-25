@@ -110,7 +110,6 @@ function addMessage(text, isUser=false){
   div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
-  // Replace \n with <br> for multi-line feedback
   bubble.innerHTML = text.replace(/\n/g, "<br>");
   div.appendChild(bubble);
   chatMessages.appendChild(div);
@@ -184,9 +183,12 @@ function sendMessage(){
 function askNextMainQuestion(){
   if(mainQuestionIndex < wellnessQuestions.length){
     setTimeout(()=> addMessage(wellnessQuestions[mainQuestionIndex].question, false), 700);
-  } else {
+  } else if(!finishedMainQuestions){
     finishedMainQuestions = true;
     setTimeout(analyzeWellnessResponses, 1000);
+  } else {
+    // FINAL QUESTION / CHAT CLOSURE
+    setTimeout(()=> addMessage("Thanks for completing the chat! Remember, you can always reach out for support whenever you need.", false), 700);
   }
 }
 
@@ -254,6 +256,9 @@ async function analyzeWellnessResponses(){
       })
     });
 
+    // FINAL CLOSURE MESSAGE
+    setTimeout(()=> addMessage("✅ You’ve completed the session. Take care of yourself and reach out if needed.", false), 1000);
+
   } catch(err){
     console.error("Error analyzing responses:", err);
     addMessage("⚠️ Failed to analyze responses. Please try again.", false);
@@ -264,12 +269,12 @@ async function analyzeWellnessResponses(){
 // EVENT LISTENERS
 // =========================
 sendBtn.addEventListener('click', e=>{
-  e.preventDefault();
+  e.preventDefault();  // prevent refresh
   sendMessage();
 });
 chatInput.addEventListener('keypress', e=>{
   if(e.key==='Enter'){
-    e.preventDefault();
+    e.preventDefault();  // prevent refresh
     sendMessage();
   }
 });
