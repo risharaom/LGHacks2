@@ -289,6 +289,5 @@ sendBtn.disabled = chatInput.value.trim() === '';
 // =========================
 // INITIALIZE CHAT (ONLY ON PAGE LOAD)
 // =========================
-if(chatMessages.children.length === 0){
-    setTimeout(()=> addMessage(icebreakers[0], false), 800);
-}
+setTimeout(()=> addMessage(icebreakers[0], false), 800);
+
