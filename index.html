@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Safe Space - Mental Health Support</title>
+    <meta name="description" content="A calming chatbot app providing mental health and addiction recovery resources in a safe, supportive environment.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="logo-title">Your Safe Space</h1>
+                    <p class="logo-subtitle">Professional Mental Health Support</p>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="desktop-nav">
+                <button class="nav-btn active" data-tab="chat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>Chatbot</span>
+                </button>
+                <button class="nav-btn" data-tab="mental-health">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span>Mental Health</span>
+                </button>
+                <button class="nav-btn" data-tab="addiction">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Addiction Support</span>
+                </button>
+                <button class="nav-btn" data-tab="resources-menu">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    <span>Resource Directory</span>
+                </button>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <h3>Menu</h3>
+            <button class="nav-btn active" data-tab="chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Chatbot
+            </button>
+            <button class="nav-btn" data-tab="mental-health">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Mental Health
+            </button>
+            <button class="nav-btn" data-tab="addiction">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                Addiction Support
+            </button>
+            <button class="nav-btn" data-tab="resources-menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Resource Directory
+            </button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="hero-title">Your Safe Space</h2>
+            <p class="hero-subtitle">A place to breathe, reflect, and find professional support</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Chat Tab -->
+        <div class="tab-content active" id="chat-tab">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-bubble">
+                            <p>Hello! I'm here to listen and support you. How are you feeling today?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Share what's on your mind...">
+                    <button class="send-btn" id="sendBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mental Health Tab -->
+        <div class="tab-content" id="mental-health-tab">
+            <div class="resources-header">
+                <h1 class="resources-title">Mental Health Resources</h1>
+                <p class="resources-subtitle">Professional resources and evidence-based strategies for mental wellness</p>
+            </div>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Understanding Mental Health</h3>
+                        <p class="resource-desc">Learn about common mental health conditions</p>
+                        <ul class="resource-list">
+                            <li>Depression: Persistent sadness and loss of interest</li>
+                            <li>Anxiety: Excessive worry and physical symptoms</li>
+                            <li>PTSD: Trauma-related stress and flashbacks</li>
+                            <li>Bipolar Disorder: Mood swings between highs and lows</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Crisis Support</h3>
+                        <p class="resource-desc">Immediate help available 24/7</p>
+                        <ul class="resource-list">
+                            <li>National Suicide Prevention: 988</li>
+                            <li>Crisis Text: HOME to 741741</li>
+                            <li>SAMHSA Helpline: 1-800-662-4357</li>
+                            <li>Veterans Crisis Line: 988 press 1</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Self-Care Strategies</h3>
+                        <p class="resource-desc">Evidence-based wellness practices</p>
+                        <ul class="resource-list">
+                            <li>Regular exercise (30 min, 3-5x/week)</li>
+                            <li>Consistent sleep schedule (7-9 hours)</li>
+                            <li>Mindfulness & meditation practice</li>
+                            <li>Balanced nutrition & hydration</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Professional Support</h3>
+                        <p class="resource-desc">Find qualified mental health professionals</p>
+                        <ul class="resource-list">
+                            <li>Psychology Today Therapist Finder</li>
+                            <li>BetterHelp & Talkspace (online therapy)</li>
+                            <li>Community mental health centers</li>
+                            <li>Employee Assistance Programs (EAP)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="emergency-notice">
+                <strong>Crisis Support Available 24/7</strong>
+                <p>If you're experiencing a mental health emergency, call <strong>988</strong> (Suicide & Crisis Lifeline) or go to your nearest emergency room. You are not alone.</p>
+            </div>
+        </div>
+
+        <!-- Addiction Tab -->
+        <div class="tab-content" id="addiction-tab">
+            <div class="resources-header">
+                <h1 class="resources-title gradient-secondary">Addiction Recovery Resources</h1>
+                <p class="resources-subtitle">Recovery is possible. Professional resources to support your healing journey</p>
+            </div>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Immediate Support</h3>
+                        <p class="resource-desc">Reach out anytime you need help</p>
+                        <ul class="resource-list secondary">
+                            <li>SAMHSA National Helpline: 1-800-662-4357</li>
+                            <li>Substance Abuse 24/7: 1-800-662-HELP</li>
+                            <li>Narcotics Anonymous: 1-800-377-9550</li>
+                            <li>Alcoholics Anonymous: AA.org</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Recovery Programs</h3>
+                        <p class="resource-desc">Evidence-based treatment options</p>
+                        <ul class="resource-list secondary">
+                            <li>12-Step Programs (AA, NA, etc.)</li>
+                            <li>SMART Recovery</li>
+                            <li>Celebrate Recovery</li>
+                            <li>Cognitive Behavioral Therapy (CBT)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Local Resources</h3>
+                        <p class="resource-desc">Find help in your community</p>
+                        <ul class="resource-list secondary">
+                            <li>SAMHSA Treatment Locator</li>
+                            <li>Local health departments</li>
+                            <li>Community mental health centers</li>
+                            <li>Hospital addiction services</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon secondary">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Education & Support</h3>
+                        <p class="resource-desc">Learn and grow in recovery</p>
+                        <ul class="resource-list secondary">
+                            <li>National Institute on Drug Abuse (NIDA)</li>
+                            <li>Partnership to End Addiction</li>
+                            <li>Addiction Policy Forum</li>
+                            <li>Faces & Voices of Recovery</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="emergency-notice secondary">
+                <strong>You Are Not Alone</strong>
+                <p>Recovery is a journey, and every step forward is a victory. If experiencing a substance-related emergency, call <strong>911</strong> immediately.</p>
+            </div>
+        </div>
+
+        <!-- Resources Menu Tab -->
+        <div class="tab-content" id="resources-menu-tab">
+            <div class="resources-header">
+                <h1 class="resources-title">Mental Health Resource Directory</h1>
+                <p class="resources-subtitle">A comprehensive guide to professional mental health support services and resources</p>
+            </div>
+
+            <div class="directory-section">
+                <div class="directory-header">
+                    <div class="directory-icon emergency">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <h2>Emergency Hotlines</h2>
+                </div>
+                <div class="directory-grid">
+                    <div class="directory-item">
+                        <h4>National Suicide Prevention Lifeline</h4>
+                        <p class="item-desc">24/7 free and confidential support</p>
+                        <p class="item-contact">988</p>
+                        <span class="item-badge">Call or Text</span>
+                    </div>
+                    <div class="directory-item">
+                        <h4>Crisis Text Line</h4>
+                        <p class="item-desc">Free 24/7 crisis support via text</p>
+                        <p class="item-contact">Text HOME to 741741</p>
+                        <span class="item-badge">Text Only</span>
+                    </div>
+                    <div class="directory-item">
+                        <h4>SAMHSA National Helpline</h4>
+                        <p class="item-desc">Substance abuse and mental health services</p>
+                        <p class="item-contact">1-800-662-4357</p>
+                        <span class="item-badge">Call</span>
+                    </div>
+                    <div class="directory-item">
+                        <h4>National Domestic Violence Hotline</h4>
+                        <p class="item-desc">24/7 support for domestic violence victims</p>
+                        <p class="item-contact">1-800-799-7233</p>
+                        <span class="item-badge">Call or Text</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="emergency-notice critical">
+                <div class="notice-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <strong>Emergency Notice</strong>
+                    <p>If you or someone you know is in immediate danger or experiencing a mental health crisis:</p>
+                    <ul>
+                        <li>Call <strong>988</strong> (Suicide & Crisis Lifeline)</li>
+                        <li>Text <strong>HOME to 741741</strong> (Crisis Text Line)</li>
+                        <li>Call <strong>911</strong> for immediate emergency</li>
+                        <li>Go to your nearest emergency room</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
