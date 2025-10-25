@@ -13,10 +13,7 @@ const chatMessages = document.getElementById('chatMessages');
 // =========================
 // MOBILE MENU
 // =========================
-mobileMenuBtn.addEventListener('click', () => {
-  mobileMenu.classList.toggle('active');
-});
-
+mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('active'));
 document.addEventListener('click', (e) => {
   if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
     mobileMenu.classList.remove('active');
@@ -31,70 +28,26 @@ navBtns.forEach(btn => {
     const tabName = btn.getAttribute('data-tab');
     navBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     tabContents.forEach(tab => tab.classList.remove('active'));
     document.getElementById(`${tabName}-tab`).classList.add('active');
-
     hero.style.display = tabName === 'chat' ? 'block' : 'none';
     mobileMenu.classList.remove('active');
   });
 });
 
 // =========================
-// CONVERSATION FLOW
+// ICEBREAKERS & CHAT FLOW
 // =========================
 const conversationFlow = [
-  {
-    id: "icebreaker1",
-    question: "Hey there! How are you feeling today?",
-    next: (answer) => {
-      if (answer.toLowerCase().includes("good") || answer.toLowerCase().includes("fine")) return "icebreaker2";
-      return "followup1";
-    }
-  },
-  {
-    id: "icebreaker2",
-    question: "Glad to hear that 😊! How has your week been so far?",
-    next: () => "followup2"
-  },
-  {
-    id: "followup1",
-    question: "I’m sorry to hear that. What’s been on your mind lately?",
-    next: () => "followup2"
-  },
-  {
-    id: "followup2",
-    question: "When you’re stressed or upset, what do you usually do to feel better?",
-    next: (answer) => {
-      if (answer.toLowerCase().includes("friends")) return "followup3_friends";
-      if (answer.toLowerCase().includes("alone")) return "followup3_alone";
-      return "followup3_generic";
-    }
-  },
-  {
-    id: "followup3_friends",
-    question: "That’s great that you have supportive friends! Do you ever feel like they influence your habits or choices?",
-    next: () => "wrapup"
-  },
-  {
-    id: "followup3_alone",
-    question: "It sounds like you prefer handling things on your own. Does that ever get overwhelming?",
-    next: () => "wrapup"
-  },
-  {
-    id: "followup3_generic",
-    question: "That’s one way to handle it. Has that been helping you lately?",
-    next: () => "wrapup"
-  },
-  {
-    id: "wrapup",
-    question: "Thanks for sharing that. Would you like to keep chatting or take a quick mental wellness check?",
-    next: () => null
-  }
+  { id: "icebreaker1", question: "Hey there! How are you feeling today?", next: (a) => a.toLowerCase().includes("good") || a.toLowerCase().includes("fine") ? "icebreaker2" : "followup1" },
+  { id: "icebreaker2", question: "Glad to hear that 😊! What’s been the highlight of your week?", next: () => "followup2" },
+  { id: "followup1", question: "I’m sorry to hear that 😔. Would you like to share what's been bothering you?", next: () => "followup2" },
+  { id: "followup2", question: "When you feel stressed or upset, what helps you cope or feel better?", next: () => "wrapup" },
+  { id: "wrapup", question: "Thanks for sharing! Would you like to do a quick check to understand your habits better?", next: () => null }
 ];
 
 // =========================
-// WELLNESS CHECK QUESTIONS
+// WELLNESS QUESTIONS BY CATEGORY (MULTIPLE OPTIONS)
 // =========================
 const wellnessSections = {
   "Social Isolation": [
@@ -130,13 +83,20 @@ const wellnessSections = {
   ]
 };
 
-let wellnessQuestions = [];
+// Generate subtleQuestions by picking a random question from each category
+let subtleQuestions = [];
 for (const section in wellnessSections) {
-  wellnessQuestions.push({ section, questions: wellnessSections[section] });
+  const options = wellnessSections[section];
+  const randomQuestion = options[Math.floor(Math.random() * options.length)];
+  subtleQuestions.push({ section, question: randomQuestion });
 }
 
+let subtleAnswers = [];
+let currentQuestionIndex = 0;
+let waitingForComfort = false;
+
 // =========================
-// DRUG DETECTION SYSTEM
+// DRUG DETECTION
 // =========================
 const drugKeywords = [
   "heroin", "cocaine", "weed", "marijuana", "ganja", "hash", "ecstasy", "molly",
@@ -146,55 +106,24 @@ const drugKeywords = [
 ];
 
 function detectDrugMention(message) {
-  const lower = message.toLowerCase();
-  return drugKeywords.some(drug => lower.includes(drug));
+  return drugKeywords.some(drug => message.toLowerCase().includes(drug));
 }
 
 function notifyDoctor(userMessage) {
   console.log("🚨 ALERT: Doctor notified about potential drug mention.");
   console.log("User message:", userMessage);
-
-  // If you want to connect to a backend API later:
-  // fetch('/api/notifyDoctor', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ message: userMessage, timestamp: Date.now() })
-  // });
-}
-
-function respondToDrugMention() {
-  addMessage("It sounds like you mentioned something related to drugs or substances. 💬", false);
-  setTimeout(() => {
-    addMessage("If you're struggling, curious, or seeking help, you're not alone. Here are some trusted, confidential resources:", false);
-    setTimeout(() => {
-      addMessage(
-        `📞 SAMHSA Helpline: 1-800-662-4357  
-💬 Crisis Text Line: Text **HELLO** to 741741  
-🌐 Visit [findtreatment.gov](https://findtreatment.gov) for free local help.`,
-        false
-      );
-    }, 1000);
-  }, 700);
 }
 
 // =========================
-// CHAT HANDLERS
+// CHAT FUNCTIONS
 // =========================
-let currentQuestionId = "icebreaker1";
-let inWellnessMode = false;
-let currentWellnessSection = 0;
-let currentWellnessIndex = 0;
-const wellnessAnswers = [];
-
 function addMessage(text, isUser = false) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-
   const bubbleDiv = document.createElement('div');
   bubbleDiv.className = 'message-bubble';
-
   const p = document.createElement('p');
-  p.innerHTML = text; // allow links
+  p.innerHTML = text;
   bubbleDiv.appendChild(p);
   messageDiv.appendChild(bubbleDiv);
   chatMessages.appendChild(messageDiv);
@@ -202,105 +131,102 @@ function addMessage(text, isUser = false) {
 }
 
 // =========================
-// MAIN SEND FUNCTION
+// SEND SUBTLE ANSWERS TO FLASK
 // =========================
-function sendMessage() {
+async function sendSubtleAnswers() {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ responses: subtleAnswers })
+    });
+    const data = await response.json();
+
+    addMessage(`🧠 Sentiment Analysis: ${data.sentiments.join(', ')}`, false);
+    addMessage(`💊 Predicted Addiction: ${data.predicted_class} (${data.addiction_percent.toFixed(1)}%)`, false);
+
+    if (data.predicted_class === "Addicted" && data.addiction_percent > 50) {
+      addMessage("It seems your responses indicate possible addictive patterns. 💡 Try seeking support, replacing habits with healthy routines, and talking to a professional.", false);
+    } else {
+      addMessage("Your responses suggest moderate stress or anxiety. 💡 Consider mindfulness exercises, journaling, or talking with someone you trust.", false);
+    }
+  } catch (err) {
+    console.error("Error sending data to backend:", err);
+    addMessage("⚠️ Failed to analyze responses. Please try again.", false);
+  }
+}
+
+// =========================
+// SEND MESSAGE MAIN
+// =========================
+function sendMessageHandler() {
   const message = chatInput.value.trim();
   if (!message) return;
 
   addMessage(message, true);
   chatInput.value = '';
 
-  // Check for drug mention
   if (detectDrugMention(message)) {
-    respondToDrugMention();
+    addMessage("It seems you mentioned something related to drugs. 💬 Here are some trusted resources:", false);
     notifyDoctor(message);
     return;
   }
 
-  if (inWellnessMode) {
-    handleWellnessResponse(message);
+  if (waitingForComfort) {
+    waitingForComfort = false;
+    if (currentQuestionIndex < subtleQuestions.length) {
+      setTimeout(() => addMessage(subtleQuestions[currentQuestionIndex].question, false), 800);
+    } else {
+      addMessage("Analyzing your responses... 🔍", false);
+      setTimeout(sendSubtleAnswers, 1000);
+    }
     return;
   }
 
-  const currentQuestion = conversationFlow.find(q => q.id === currentQuestionId);
-  let nextQuestionId = currentQuestion?.next ? currentQuestion.next(message) : null;
+  if (currentQuestionIndex < subtleQuestions.length) {
+    subtleAnswers.push(message.toLowerCase().includes("yes") ? 1 : 0);
 
-  if (currentQuestionId === "wrapup") {
-    if (message.toLowerCase().includes("yes") || message.toLowerCase().includes("check")) {
-      inWellnessMode = true;
-      setTimeout(() => {
-        addMessage("Alright 💬 Let’s start your quick wellness check. Please answer each with 'Yes' or 'No'.", false);
-        setTimeout(() => askNextWellnessQuestion(), 1200);
-      }, 800);
-      return;
-    } else {
-      setTimeout(() => addMessage("No worries 💛 I’m always here if you just want to talk.", false), 800);
+    const comfortPhrases = [
+      "Thanks for sharing that, it's okay to feel that way.",
+      "I hear you. You're doing great by opening up.",
+      "That's completely normal, many people feel this way sometimes.",
+      "I appreciate your honesty — you're taking a positive step by reflecting."
+    ];
+    addMessage(comfortPhrases[Math.floor(Math.random() * comfortPhrases.length)], false);
+
+    currentQuestionIndex++;
+    waitingForComfort = true;
+  } else {
+    const currentQuestion = conversationFlow.find(q => q.id === currentQuestionId);
+    let nextId = currentQuestion?.next ? currentQuestion.next(message) : null;
+
+    if (currentQuestionId === "wrapup") {
+      setTimeout(() => addMessage("Alright 💬 Let’s start your wellness check. Answer each with 'Yes' or 'No'.", false), 800);
+      setTimeout(() => addMessage(subtleQuestions[currentQuestionIndex].question, false), 1200);
       return;
     }
-  }
 
-  if (nextQuestionId) {
-    currentQuestionId = nextQuestionId;
-    const nextQuestion = conversationFlow.find(q => q.id === currentQuestionId);
-    setTimeout(() => addMessage(nextQuestion.question, false), 800);
-  } else {
-    setTimeout(() => addMessage("Thanks for opening up 💬. I’ll pass this info to my analysis system to understand your well-being.", false), 800);
-  }
-}
-
-// =========================
-// WELLNESS CHECK LOGIC
-// =========================
-function askNextWellnessQuestion() {
-  const section = wellnessQuestions[currentWellnessSection];
-  if (!section) {
-    addMessage("That’s all for now 💭 Thank you for taking this check. Reflecting on these can really help.", false);
-    inWellnessMode = false;
-    currentWellnessSection = 0;
-    currentWellnessIndex = 0;
-    return;
-  }
-
-  const question = section.questions[currentWellnessIndex];
-  addMessage(`${section.section} — ${question}`, false);
-}
-
-function handleWellnessResponse(answer) {
-  wellnessAnswers.push(answer.toLowerCase().includes("yes") ? 1 : 0);
-
-  const section = wellnessQuestions[currentWellnessSection];
-  currentWellnessIndex++;
-
-  if (currentWellnessIndex >= section.questions.length) {
-    currentWellnessSection++;
-    currentWellnessIndex = 0;
-    if (currentWellnessSection < wellnessQuestions.length) {
-      setTimeout(() => {
-        addMessage(`Let's talk about ${wellnessQuestions[currentWellnessSection].section} next.`, false);
-        setTimeout(() => askNextWellnessQuestion(), 1000);
-      }, 800);
+    if (nextId) {
+      currentQuestionId = nextId;
+      const nextQuestion = conversationFlow.find(q => q.id === currentQuestionId);
+      setTimeout(() => addMessage(nextQuestion.question, false), 800);
     } else {
-      addMessage("That was the last section ✅. Thank you for being honest — your responses can help identify possible stress or habit patterns.", false);
-      inWellnessMode = false;
+      setTimeout(() => addMessage("Thanks for sharing 💬. I’ll pass this info to my analysis system.", false), 800);
     }
-  } else {
-    setTimeout(() => askNextWellnessQuestion(), 700);
   }
 }
 
 // =========================
 // EVENT LISTENERS
 // =========================
-sendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
+sendBtn.addEventListener('click', sendMessageHandler);
+chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessageHandler(); });
+chatInput.addEventListener('input', () => { sendBtn.disabled = !chatInput.value.trim(); });
 
-chatInput.addEventListener('input', () => {
-  sendBtn.disabled = !chatInput.value.trim();
-});
-
-// Initialize
+// =========================
+// INIT
+// =========================
+let currentQuestionId = "icebreaker1";
+let inWellnessMode = false;
 sendBtn.disabled = true;
 setTimeout(() => addMessage(conversationFlow.find(q => q.id === "icebreaker1").question, false), 800);
