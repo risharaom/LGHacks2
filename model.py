@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import numpy as np
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
@@ -25,33 +26,31 @@ def similarity_score(user, group):
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    data = request.json
-    responses = data.get("responses", [])
+    try:
+        data = request.json
+        responses = data.get("responses", [])
 
-    # Create user input aligned with feature columns
-    # Pad or trim to match the number of features
-    user_input = pd.Series(responses[:len(feature_cols)], index=feature_cols[:len(responses)])
+        # Create user input aligned with feature columns
+        user_input = pd.Series(responses[:len(feature_cols)], index=feature_cols[:len(responses)])
 
-    sim_addicted = similarity_score(user_input, addicted)
-    sim_not_addicted = similarity_score(user_input, not_addicted)
+        sim_addicted = similarity_score(user_input, addicted)
+        sim_not_addicted = similarity_score(user_input, not_addicted)
 
-    if np.isnan(sim_addicted) or np.isnan(sim_not_addicted) or (sim_addicted + sim_not_addicted == 0):
-        addiction_percent = 0
-    else:
-        addiction_percent = sim_addicted / (sim_addicted + sim_not_addicted) * 100
+        if np.isnan(sim_addicted) or np.isnan(sim_not_addicted) or (sim_addicted + sim_not_addicted == 0):
+            addiction_percent = 0
+        else:
+            addiction_percent = sim_addicted / (sim_addicted + sim_not_addicted) * 100
 
-    predicted_class = "Addicted" if sim_addicted > sim_not_addicted else "Not Addicted"
+        predicted_class = "Addicted" if sim_addicted > sim_not_addicted else "Not Addicted"
 
         return jsonify({
-            "addiction_score": round(addiction_score, 2),
-            "addiction_percent": addiction_percent,
+            "addiction_percent": round(addiction_percent, 2),
             "predicted_class": predicted_class
         })
 
     except Exception as e:
         print("Error processing request:", e)
         return jsonify({"error": "Internal server error"}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
