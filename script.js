@@ -49,9 +49,7 @@ function detectAlert(message){
 }
 function alertProfessional(message){
   addMessage("⚠️ It seems you mentioned something serious regarding drugs or self-harm. Please consider contacting a professional immediately.", false);
-  addMessage(`📞 SAMHSA Helpline: 1-800-662-4357
-💬 Crisis Text Line: Text HELLO to 741741
-🌐 Visit [findtreatment.gov](https://findtreatment.gov)`, false);
+  addMessage(`📞 SAMHSA Helpline: 1-800-662-4357<br>💬 Crisis Text Line: Text HELLO to 741741<br>🌐 Visit <a href="https://findtreatment.gov" target="_blank">findtreatment.gov</a>`, false);
   console.log("ALERT TRIGGERED:", message);
 }
 
@@ -112,7 +110,8 @@ function addMessage(text, isUser=false){
   div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
-  bubble.innerHTML = text;
+  // Replace \n with <br> for multi-line feedback
+  bubble.innerHTML = text.replace(/\n/g, "<br>");
   div.appendChild(bubble);
   chatMessages.appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -132,6 +131,7 @@ function sendMessage(){
     return;
   }
 
+  // Icebreaker flow
   if(icebreakerIndex < icebreakers.length){
     icebreakerIndex++;
     if(icebreakerIndex < icebreakers.length){
@@ -142,6 +142,7 @@ function sendMessage(){
     return;
   }
 
+  // "Tell me more"
   if(inTellMeMore){
     addMessage("Thanks for sharing that.", false);
     inTellMeMore = false;
@@ -150,6 +151,7 @@ function sendMessage(){
     return;
   }
 
+  // Main wellness questions
   if(!finishedMainQuestions && mainQuestionIndex < wellnessQuestions.length){
     const answer = msg.toLowerCase().includes("yes") ? 1 : 0;
     wellnessAnswers.push(answer);
@@ -164,7 +166,7 @@ function sendMessage(){
     return;
   }
 
-  // Comforting generic responses
+  // Generic comforting responses
   const comfortingResponses = [
     "I hear you.",
     "That’s totally normal.",
@@ -192,21 +194,21 @@ function askNextMainQuestion(){
 // GENERATE PERSONALIZED FEEDBACK
 // =========================
 function generatePersonalizedFeedback(addictionPercent, addictionClass, symptoms){
-  let feedback = `Your score indicates ${addictionClass} (${addictionPercent.toFixed(1)}%). `;
+  let feedback = `Your score indicates ${addictionClass} (${addictionPercent.toFixed(1)}%).\n`;
 
   if(symptoms.length > 0){
-    feedback += "Based on your answers, some areas to focus on are: ";
-    feedback += symptoms.join(", ") + ". ";
+    feedback += "Based on your answers, focus on these areas:\n";
+    symptoms.forEach(s => feedback += `- ${s}\n`);
   }
 
   if(addictionPercent <= 25){
-    feedback += "You appear to have low risk. Maintaining healthy routines and self-care is recommended.";
+    feedback += "Low risk: maintain healthy routines and self-care.\n";
   } else if(addictionPercent <= 50){
-    feedback += "You have a moderate risk. Consider mindfulness, journaling, and talking with trusted friends or a counselor.";
+    feedback += "Moderate risk: consider mindfulness, journaling, and talking with trusted friends or a counselor.\n";
   } else if(addictionPercent <= 75){
-    feedback += "You have a high risk. It is recommended to seek structured support programs or therapy and monitor triggers closely.";
+    feedback += "High risk: seek structured support programs or therapy and monitor triggers closely.\n";
   } else {
-    feedback += "Your risk is very high. Please consider immediate professional help, contact hotlines, or rehabilitation services.";
+    feedback += "Very high risk: seek immediate professional help, contact hotlines, or rehabilitation services.\n";
   }
 
   return feedback;
@@ -225,6 +227,8 @@ async function analyzeWellnessResponses(){
       body: JSON.stringify({responses: wellnessAnswers})
     });
 
+    if(!response.ok) throw new Error("Failed to fetch from backend");
+
     const data = await response.json();
 
     const symptoms = wellnessQuestions
@@ -239,7 +243,7 @@ async function analyzeWellnessResponses(){
 
     addMessage(personalizedFeedback, false);
 
-    // Optional: store results in backend
+    // Optional: store results
     await fetch("http://127.0.0.1:5000/store_results", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -259,8 +263,16 @@ async function analyzeWellnessResponses(){
 // =========================
 // EVENT LISTENERS
 // =========================
-sendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keypress', e=>{if(e.key==='Enter') sendMessage();});
+sendBtn.addEventListener('click', e=>{
+  e.preventDefault();
+  sendMessage();
+});
+chatInput.addEventListener('keypress', e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    sendMessage();
+  }
+});
 chatInput.addEventListener('input', ()=>{sendBtn.disabled = !chatInput.value.trim();});
 sendBtn.disabled = chatInput.value.trim() === '';
 
