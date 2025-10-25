@@ -43,10 +43,12 @@ const alertKeywords = [
   "vape","nicotine","cannabis","gabapentin","etizolam","2-dpmp","tobacco","fags","baccy",
   "balloons","nitrous oxide","fentanyl","acetylfentanyl","opioid","opiate","drugs","suicide","self harm"
 ];
+
 function detectAlert(message){
   const lower = message.toLowerCase();
   return alertKeywords.some(word => lower.includes(word));
 }
+
 function alertProfessional(message){
   addMessage("⚠️ It seems you mentioned something serious regarding drugs or self-harm. Please consider contacting a professional immediately.", false);
   addMessage(`📞 SAMHSA Helpline: 1-800-662-4357<br>💬 Crisis Text Line: Text HELLO to 741741<br>🌐 Visit <a href="https://findtreatment.gov" target="_blank">findtreatment.gov</a>`, false);
@@ -101,6 +103,7 @@ let mainQuestionIndex = 0;
 let inTellMeMore = false;
 let wellnessAnswers = [];
 let finishedMainQuestions = false;
+let chatEnded = false;
 
 // =========================
 // ADD CHAT MESSAGE
@@ -120,6 +123,8 @@ function addMessage(text, isUser=false){
 // SEND MESSAGE
 // =========================
 function sendMessage(){
+  if(chatEnded) return; // prevent sending after chat ends
+
   const msg = chatInput.value.trim();
   if(!msg) return;
   addMessage(msg, true);
@@ -186,9 +191,6 @@ function askNextMainQuestion(){
   } else if(!finishedMainQuestions){
     finishedMainQuestions = true;
     setTimeout(analyzeWellnessResponses, 1000);
-  } else {
-    // FINAL QUESTION / CHAT CLOSURE
-    setTimeout(()=> addMessage("Thanks for completing the chat! Remember, you can always reach out for support whenever you need.", false), 700);
   }
 }
 
@@ -257,7 +259,10 @@ async function analyzeWellnessResponses(){
     });
 
     // FINAL CLOSURE MESSAGE
-    setTimeout(()=> addMessage("✅ You’ve completed the session. Take care of yourself and reach out if needed.", false), 1000);
+    setTimeout(()=>{
+      addMessage("✅ You’ve completed the session. Take care of yourself and reach out if needed.", false);
+      chatEnded = true; // prevent further input
+    }, 1000);
 
   } catch(err){
     console.error("Error analyzing responses:", err);
@@ -282,6 +287,8 @@ chatInput.addEventListener('input', ()=>{sendBtn.disabled = !chatInput.value.tri
 sendBtn.disabled = chatInput.value.trim() === '';
 
 // =========================
-// INITIALIZE CHAT
+// INITIALIZE CHAT (ONLY ON PAGE LOAD)
 // =========================
-setTimeout(()=> addMessage(icebreakers[0], false), 800);
+if(chatMessages.children.length === 0){
+    setTimeout(()=> addMessage(icebreakers[0], false), 800);
+}
